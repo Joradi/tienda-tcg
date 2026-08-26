@@ -5,6 +5,8 @@ import com.tiendatcg.cardset.CardSetService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -64,4 +66,48 @@ public class CardService {
             cardRepository.save(card);
         }
     }
+
+    public List<Card> searchCards(String query)
+    {
+        String value = query.trim();
+
+        if(value.matches("\\d+/\\d+"))
+        {
+            String[] parts = value.split("/");
+
+            int cardNumber = Integer.parseInt(parts[0]);
+            int printedTotal = Integer.parseInt(parts[1]);
+
+            List<Card> candidates =
+                    cardRepository.findByCardSet_PrintedTotal(printedTotal);
+
+            List<Card> results = new ArrayList<>();
+
+            for(Card card : candidates)
+            {
+                try {
+                        int storedNumber = Integer.parseInt(card.getNumber());
+
+                        if(storedNumber == cardNumber)
+                        {
+                            results.add(card);
+                        }
+                }
+                catch (NumberFormatException ignored)
+                {
+
+                }
+            }
+            return results;
+        }
+
+        return cardRepository.findByNameContainingIgnoreCase(value);
+    }
+
+    public Optional<Card> findById(Long id)
+    {
+        return cardRepository.findById(id);
+    }
+
+
 }

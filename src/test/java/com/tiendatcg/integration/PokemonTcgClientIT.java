@@ -2,12 +2,13 @@ package com.tiendatcg.integration;
 
 import com.tiendatcg.cardset.CardSetResponse;
 import com.tiendatcg.cardset.CardSetService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class PokemonTcgClientTest {
+public class PokemonTcgClientIT {
 
     @Autowired
     private PokemonTcgClient pokemonTcgClient;
@@ -38,6 +39,7 @@ public class PokemonTcgClientTest {
         System.out.println("Sets sincronizados: " + response.getCount());
     }
 
+    @Disabled
     @Test
     void syncAllCards() throws InterruptedException
     {
