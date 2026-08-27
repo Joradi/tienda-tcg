@@ -1,1 +1,7 @@
-GET http://localhost:8080/products/card/5/available
+PATCH http://localhost:8080/products/2
+Authorization: Basic admin@test.com adminSeguro123
+Content-Type: application/json
+
+{
+  "stock": 12
+}
