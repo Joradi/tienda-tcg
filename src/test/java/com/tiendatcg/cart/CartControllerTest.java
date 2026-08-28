@@ -39,7 +39,8 @@ public class CartControllerTest {
     private CartMapper cartMapper;
 
     @Test
-    void shouldCreateGuestCartWhenNoGuestTokenIsProvided() throws Exception {
+    void shouldCreateGuestCartWhenNoGuestTokenIsProvided() throws Exception
+    {
 
         UUID guestToken = UUID.randomUUID();
 
@@ -71,7 +72,8 @@ public class CartControllerTest {
     }
 
     @Test
-    void shouldReturnExistingGuestCartWhenGuestTokenIsProvided() throws Exception {
+    void shouldReturnExistingGuestCartWhenGuestTokenIsProvided() throws Exception
+    {
 
         UUID guestToken = UUID.randomUUID();
 
@@ -92,13 +94,7 @@ public class CartControllerTest {
         when(cartMapper.toResponse(cart))
                 .thenReturn(response);
 
-        mockMvc.perform(
-                        get("/cart")
-                                .header(
-                                        "X-Guest-Cart-Token",
-                                        guestToken.toString()
-                                )
-                )
+        mockMvc.perform(get("/cart").header("X-Guest-Cart-Token", guestToken.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.guestToken").value(guestToken.toString()));
 
@@ -107,7 +103,8 @@ public class CartControllerTest {
     }
 
     @Test
-    void shouldAddItemToGuestCart() throws Exception {
+    void shouldAddItemToGuestCart() throws Exception
+    {
 
         UUID guestToken = UUID.randomUUID();
 
@@ -132,12 +129,7 @@ public class CartControllerTest {
         when(cartMapper.toResponse(updatedCart))
                 .thenReturn(response);
 
-        mockMvc.perform(
-                        post("/cart/items")
-                                .header(
-                                        "X-Guest-Cart-Token",
-                                        guestToken.toString()
-                                )
+        mockMvc.perform(post("/cart/items").header("X-Guest-Cart-Token", guestToken.toString())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                         {
@@ -155,10 +147,9 @@ public class CartControllerTest {
     }
 
     @Test
-    void shouldUpdateItemQuantityInGuestCart() throws Exception {
-
+    void shouldUpdateItemQuantityInGuestCart() throws Exception
+    {
         UUID guestToken = UUID.randomUUID();
-
         Cart cart = new Cart(guestToken);
         Cart updatedCart = new Cart(guestToken);
 
@@ -181,11 +172,7 @@ public class CartControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(
-                        patch("/cart/items/5")
-                                .header(
-                                        "X-Guest-Cart-Token",
-                                        guestToken.toString()
-                                )
+                        patch("/cart/items/5").header("X-Guest-Cart-Token", guestToken.toString())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                             {
@@ -202,13 +189,11 @@ public class CartControllerTest {
     }
 
     @Test
-    void shouldRemoveItemFromGuestCart() throws Exception {
-
+    void shouldRemoveItemFromGuestCart() throws Exception
+    {
         UUID guestToken = UUID.randomUUID();
-
         Cart cart = new Cart(guestToken);
         Cart updatedCart = new Cart(guestToken);
-
         CartResponseDto response = new CartResponseDto(
                 1L,
                 guestToken,
@@ -227,13 +212,7 @@ public class CartControllerTest {
         when(cartMapper.toResponse(updatedCart))
                 .thenReturn(response);
 
-        mockMvc.perform(
-                        delete("/cart/items/5")
-                                .header(
-                                        "X-Guest-Cart-Token",
-                                        guestToken.toString()
-                                )
-                )
+        mockMvc.perform(delete("/cart/items/5").header("X-Guest-Cart-Token", guestToken.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(0));
 
@@ -243,13 +222,11 @@ public class CartControllerTest {
     }
 
     @Test
-    void shouldClearGuestCart() throws Exception {
-
+    void shouldClearGuestCart() throws Exception
+    {
         UUID guestToken = UUID.randomUUID();
-
         Cart cart = new Cart(guestToken);
         Cart updatedCart = new Cart(guestToken);
-
         CartResponseDto response = new CartResponseDto(
                 1L,
                 guestToken,
@@ -268,13 +245,7 @@ public class CartControllerTest {
         when(cartMapper.toResponse(updatedCart))
                 .thenReturn(response);
 
-        mockMvc.perform(
-                        delete("/cart/items")
-                                .header(
-                                        "X-Guest-Cart-Token",
-                                        guestToken.toString()
-                                )
-                )
+        mockMvc.perform(delete("/cart/items").header("X-Guest-Cart-Token", guestToken.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items").isArray())
                 .andExpect(jsonPath("$.total").value(0));
@@ -285,12 +256,10 @@ public class CartControllerTest {
     }
 
     @Test
-    void shouldUseUserCartWhenUserIsAuthenticated() throws Exception {
-
+    void shouldUseUserCartWhenUserIsAuthenticated() throws Exception
+    {
         String email = "cliente@test.com";
-
         Cart cart = new Cart(mock(com.tiendatcg.user.User.class));
-
         CartResponseDto response = new CartResponseDto(
                 1L,
                 null,
@@ -299,15 +268,8 @@ public class CartControllerTest {
                 0L,
                 0L
         );
-
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        email,
-                        null,
-                        List.of(
-                                new SimpleGrantedAuthority("ROLE_CUSTOMER")
-                        )
-                );
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null,
+                List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER")));
 
         when(cartService.getOrCreateUserCart(email))
                 .thenReturn(cart);
@@ -316,9 +278,7 @@ public class CartControllerTest {
                 .thenReturn(response);
 
         mockMvc.perform(
-                        get("/cart")
-                                .principal(authentication)
-                )
+                        get("/cart").principal(authentication))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.guestToken").doesNotExist())
                 .andExpect(jsonPath("$.total").value(0));
@@ -329,16 +289,11 @@ public class CartControllerTest {
     }
 
     @Test
-    void shouldReturn400WhenQuantityIsInvalid() throws Exception {
-
+    void shouldReturn400WhenQuantityIsInvalid() throws Exception
+    {
         UUID guestToken = UUID.randomUUID();
-
         mockMvc.perform(
-                        post("/cart/items")
-                                .header(
-                                        "X-Guest-Cart-Token",
-                                        guestToken.toString()
-                                )
+                        post("/cart/items").header("X-Guest-Cart-Token", guestToken.toString())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                             {

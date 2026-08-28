@@ -37,9 +37,7 @@ public class CartServiceTest {
     void shouldAddNewProductToCart()
     {
         Cart cart = new Cart(UUID.randomUUID());
-
         Card card = new Card();
-
         Product product  = new Product(
                 card,
                 Language.ENGLISH,
@@ -77,24 +75,16 @@ public class CartServiceTest {
         Product product = mock(Product.class);
 
         when(product.getId()).thenReturn(5L);
+
         when(product.getStock()).thenReturn(10);
 
-        cart.getItems().add(
-                new CartItem(cart, product, 2)
-        );
+        cart.getItems().add(new CartItem(cart, product, 2));
 
-        when(productRepository.findById(5L))
-                .thenReturn(Optional.of(product));
+        when(productRepository.findById(5L)).thenReturn(Optional.of(product));
 
-        when(cartRepository.save(cart))
-                .thenReturn(cart);
+        when(cartRepository.save(cart)).thenReturn(cart);
 
-        Cart result = cartService.addProduct(
-                cart,
-                5L,
-                3
-        );
-
+        Cart result = cartService.addProduct(cart, 5L, 3);
         assertEquals(1, result.getItems().size());
         assertEquals(5, result.getItems().getFirst().getQuantity());
 
@@ -110,9 +100,7 @@ public class CartServiceTest {
         when(product.getId()).thenReturn(5L);
         when(product.getStock()).thenReturn(4);
 
-        cart.getItems().add(
-                new CartItem(cart, product, 2)
-        );
+        cart.getItems().add(new CartItem(cart, product, 2));
 
         when(productRepository.findById(5L))
                 .thenReturn(Optional.of(product));
@@ -130,8 +118,8 @@ public class CartServiceTest {
     }
 
     @Test
-    void shouldUpdateItemQuantity() {
-
+    void shouldUpdateItemQuantity()
+    {
         Cart cart = new Cart(UUID.randomUUID());
 
         Product product = mock(Product.class);
@@ -191,9 +179,7 @@ public class CartServiceTest {
 
         when(product.getId()).thenReturn(5L);
 
-        cart.getItems().add(
-                new CartItem(cart, product, 2)
-        );
+        cart.getItems().add(new CartItem(cart, product, 2));
 
         when(cartRepository.save(cart))
                 .thenReturn(cart);
@@ -228,20 +214,14 @@ public class CartServiceTest {
     void shouldClearCart()
     {
         Cart cart = new Cart(UUID.randomUUID());
-
         Product product1 = mock(Product.class);
         Product product2 = mock(Product.class);
 
-        cart.getItems().add(
-                new CartItem(cart, product1, 2)
-        );
+        cart.getItems().add(new CartItem(cart, product1, 2));
 
-        cart.getItems().add(
-                new CartItem(cart, product2, 1)
-        );
+        cart.getItems().add(new CartItem(cart, product2, 1));
 
-        when(cartRepository.save(cart))
-                .thenReturn(cart);
+        when(cartRepository.save(cart)).thenReturn(cart);
 
         Cart result = cartService.clearCart(cart);
 
@@ -252,8 +232,8 @@ public class CartServiceTest {
     }
 
     @Test
-    void shouldCreateGuestCartWhenTokenIsNull() {
-
+    void shouldCreateGuestCartWhenTokenIsNull()
+    {
         when(cartRepository.save(any(Cart.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -281,10 +261,9 @@ public class CartServiceTest {
     }
 
     @Test
-    void shouldThrowWhenGuestTokenDoesNotExist() {
-
+    void shouldThrowWhenGuestTokenDoesNotExist()
+    {
         UUID guestToken = UUID.randomUUID();
-
         when(cartRepository.findByGuestToken(guestToken))
                 .thenReturn(Optional.empty());
 
@@ -300,7 +279,6 @@ public class CartServiceTest {
     void shouldReturnExistingUserCart()
     {
         String email = "cliente@test.com";
-
         User user = mock(User.class);
         Cart existingCart = new Cart(user);
 
@@ -318,12 +296,10 @@ public class CartServiceTest {
     }
 
     @Test
-    void shouldCreateCartForUserWhenNoneExists() {
-
+    void shouldCreateCartForUserWhenNoneExists()
+    {
         String email = "cliente@test.com";
-
         User user = mock(User.class);
-
         when(userRepository.findByEmail(email))
                 .thenReturn(Optional.of(user));
 
@@ -344,7 +320,6 @@ public class CartServiceTest {
     void shouldThrowWhenUserDoesNotExist()
     {
         String email = "noexiste@test.com";
-
         assertThrows(
                 UsernameNotFoundException.class,
                 () -> cartService.getOrCreateUserCart(email)

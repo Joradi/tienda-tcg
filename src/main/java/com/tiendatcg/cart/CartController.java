@@ -23,108 +23,58 @@ public class CartController {
     }
 
     @GetMapping
-    public CartResponseDto getCart(
-            Authentication authentication,
-            @RequestHeader(
-                    value = "X-Guest-Cart-Token",
-                    required = false
-            ) UUID guestToken
-    ) {
+    public CartResponseDto getCart(Authentication authentication, @RequestHeader(value = "X-Guest-Cart-Token",
+            required = false) UUID guestToken)
+    {
         Cart cart = resolveCart(authentication, guestToken);
-
         return cartMapper.toResponse(cart);
     }
 
     @PostMapping("/items")
-    public CartResponseDto addItem(
-            Authentication authentication,
-            @RequestHeader(
-                    value = "X-Guest-Cart-Token",
-                    required = false
-            ) UUID guestToken,
-            @Valid @RequestBody CartAddItemRequest request
-    ) {
+    public CartResponseDto addItem(Authentication authentication, @RequestHeader(value = "X-Guest-Cart-Token", required = false) UUID guestToken,
+            @Valid @RequestBody CartAddItemRequest request)
+    {
         Cart cart = resolveCart(authentication, guestToken);
-
-        Cart updatedCart = cartService.addProduct(
-                cart,
-                request.getProductId(),
-                request.getQuantity()
-        );
-
+        Cart updatedCart = cartService.addProduct(cart, request.getProductId(), request.getQuantity());
         return cartMapper.toResponse(updatedCart);
     }
 
     @PatchMapping("/items/{productId}")
-    public CartResponseDto updateItemQuantity(
-            Authentication authentication,
-            @RequestHeader(
-                    value = "X-Guest-Cart-Token",
-                    required = false
-            ) UUID guestToken,
-            @PathVariable Long productId,
-            @Valid @RequestBody CartUpdateItemRequest request
-    ) {
+    public CartResponseDto updateItemQuantity(Authentication authentication, @RequestHeader(value = "X-Guest-Cart-Token", required = false) UUID guestToken,
+            @PathVariable Long productId, @Valid @RequestBody CartUpdateItemRequest request)
+    {
         Cart cart = resolveCart(authentication, guestToken);
-
-        Cart updatedCart = cartService.updateQuantity(
-                cart,
-                productId,
-                request.getQuantity()
-        );
-
+        Cart updatedCart = cartService.updateQuantity(cart, productId, request.getQuantity());
         return cartMapper.toResponse(updatedCart);
     }
 
     @DeleteMapping("/items/{productId}")
-    public CartResponseDto removeItem(
-            Authentication authentication,
-            @RequestHeader(
-                    value = "X-Guest-Cart-Token",
-                    required = false
-            ) UUID guestToken,
-            @PathVariable Long productId
-    ) {
+    public CartResponseDto removeItem(Authentication authentication, @RequestHeader(value = "X-Guest-Cart-Token", required = false) UUID guestToken,
+            @PathVariable Long productId)
+    {
         Cart cart = resolveCart(authentication, guestToken);
-
-        Cart updatedCart = cartService.removeProduct(
-                cart,
-                productId
-        );
-
+        Cart updatedCart = cartService.removeProduct(cart, productId);
         return cartMapper.toResponse(updatedCart);
     }
 
     @DeleteMapping("/items")
-    public CartResponseDto clearCart(
-            Authentication authentication,
-            @RequestHeader(
-                    value = "X-Guest-Cart-Token",
-                    required = false
-            ) UUID guestToken
-    ) {
+    public CartResponseDto clearCart(Authentication authentication, @RequestHeader(value = "X-Guest-Cart-Token", required = false) UUID guestToken)
+    {
         Cart cart = resolveCart(authentication, guestToken);
-
         Cart updatedCart = cartService.clearCart(cart);
-
         return cartMapper.toResponse(updatedCart);
     }
 
-    private Cart resolveCart(
-            Authentication authentication,
-            UUID guestToken
-    ) {
-        boolean authenticatedUser =
-                authentication != null
+    private Cart resolveCart(Authentication authentication, UUID guestToken)
+    {
+        boolean authenticatedUser = authentication != null
                         && authentication.isAuthenticated()
                         && !(authentication instanceof AnonymousAuthenticationToken);
 
-        if (authenticatedUser) {
-            return cartService.getOrCreateUserCart(
-                    authentication.getName()
-            );
+        if (authenticatedUser)
+        {
+            return cartService.getOrCreateUserCart(authentication.getName());
         }
-
         return cartService.getOrCreateGuestCart(guestToken);
     }
 }

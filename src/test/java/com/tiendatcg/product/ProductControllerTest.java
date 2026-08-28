@@ -48,9 +48,7 @@ public class ProductControllerTest {
         when(productService.getProductById(2L))
                 .thenReturn(product);
 
-        mockMvc.perform(
-                        get("/products/2")
-                )
+        mockMvc.perform(get("/products/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cardName").value("Bulbasaur"))
                 .andExpect(jsonPath("$.stock").value(10))

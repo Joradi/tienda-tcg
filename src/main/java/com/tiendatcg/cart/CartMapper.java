@@ -16,7 +16,6 @@ public class CartMapper {
     }
 
     public CartItemResponseDto toItemResponse(CartItem item) {
-
         long unitPrice = item.getProduct().getPrice();
         long subtotal = unitPrice * item.getQuantity();
 

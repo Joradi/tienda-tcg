@@ -8,9 +8,7 @@ import java.math.RoundingMode;
 
 @Component
 public class TaxCalculator {
-
     private final BigDecimal taxRate;
-
     public TaxCalculator(@Value("${store.tax-rate}") BigDecimal taxRate) {
         this.taxRate = taxRate;
     }
@@ -23,17 +21,8 @@ public class TaxCalculator {
 
         BigDecimal totalAmount = BigDecimal.valueOf(total);
         BigDecimal divisor = BigDecimal.ONE.add(taxRate);
-        long netAmount = totalAmount
-                .divide(divisor, 0, RoundingMode.HALF_UP)
-                .longValue();
-
+        long netAmount = totalAmount.divide(divisor, 0, RoundingMode.HALF_UP).longValue();
         long taxAmount = total - netAmount;
-
-        return new TaxBreakdown(
-                netAmount,
-                taxAmount,
-                total
-        );
-
+        return new TaxBreakdown(netAmount, taxAmount, total);
     }
 }

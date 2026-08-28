@@ -33,19 +33,15 @@ public class ProductServiceTest {
         when(productRepository.findById(999L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(
-                ProductNotFoundException.class,
-                () -> productService.getProductById(999L)
-        );
+        assertThrows(ProductNotFoundException.class,
+                () -> productService.getProductById(999L));
     }
 
     @Test
     void shouldThrowWhenProductAlreadyExists()
     {
         Card card = new Card();
-
         ProductCreateRequest request = mock(ProductCreateRequest.class);
-
         when(request.getCardId()).thenReturn(5L);
         when(request.getLanguage()).thenReturn(Language.ENGLISH);
         when(request.getVariant()).thenReturn(Variant.HOLO);

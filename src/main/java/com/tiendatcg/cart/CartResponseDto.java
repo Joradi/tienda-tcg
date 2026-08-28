@@ -12,14 +12,7 @@ public class CartResponseDto {
     private long taxAmount;
     private long total;
 
-    public CartResponseDto(
-            Long cartId,
-            UUID guestToken,
-            List<CartItemResponseDto> items,
-            long netAmount,
-            long taxAmount,
-            long total
-    ) {
+    public CartResponseDto(Long cartId, UUID guestToken, List<CartItemResponseDto> items, long netAmount, long taxAmount, long total) {
         this.cartId = cartId;
         this.guestToken = guestToken;
         this.items = items;
