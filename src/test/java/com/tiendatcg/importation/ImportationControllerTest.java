@@ -29,6 +29,9 @@ class ImportationControllerTest {
     @MockitoBean
     private ImportAnalysisService analysisService;
 
+    @MockitoBean
+    private ImportProfitabilityCalculator profitabilityCalculator;
+
     @Test
     void shouldCreateImportation() throws Exception {
 

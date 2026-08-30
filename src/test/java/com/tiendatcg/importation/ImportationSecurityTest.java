@@ -32,7 +32,11 @@ class ImportationSecurityTest {
     private ImportAnalysisService analysisService;
 
     @MockitoBean
+    private ImportProfitabilityCalculator profitabilityCalculator;
+
+    @MockitoBean
     private JwtDecoder jwtDecoder;
+
 
     @Test
     void shouldReturn401WhenUserIsNotAuthenticated() throws Exception
@@ -88,8 +92,7 @@ class ImportationSecurityTest {
         when(importationService.getImportations()).thenReturn(List.of());
 
         mockMvc.perform(get("/importations").header(
-                                        HttpHeaders.AUTHORIZATION,
-                                        "Bearer admin-token"))
+                                        HttpHeaders.AUTHORIZATION, "Bearer admin-token"))
                 .andExpect(status().isOk());
     }
 }

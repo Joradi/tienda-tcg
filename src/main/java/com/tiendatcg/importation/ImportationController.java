@@ -12,22 +12,29 @@ public class ImportationController {
 
     private final ImportationService importationService;
     private final ImportAnalysisService analysisService;
+    private final ImportProfitabilityCalculator profitabilityCalculator;
 
-    public ImportationController(ImportationService importationService, ImportAnalysisService analysisService)
+    public ImportationController(
+            ImportationService importationService,
+            ImportAnalysisService analysisService,
+            ImportProfitabilityCalculator profitabilityCalculator)
     {
         this.importationService = importationService;
         this.analysisService = analysisService;
+        this.profitabilityCalculator = profitabilityCalculator;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ImportationResponseDto createImportation(@Valid @RequestBody ImportationCreateRequest request)
+    public ImportationResponseDto createImportation(
+            @Valid @RequestBody ImportationCreateRequest request)
     {
         return importationService.createImportation(request);
     }
 
     @GetMapping
-    public List<ImportationResponseDto> getImportations() {
+    public List<ImportationResponseDto> getImportations()
+    {
         return importationService.getImportations();
     }
 
@@ -44,8 +51,19 @@ public class ImportationController {
     }
 
     @PostMapping("/scenarios/compare")
-    public ImportScenarioComparison compareScenarios(@Valid @RequestBody ImportScenarioComparisonRequest request)
+    public ImportScenarioComparison compareScenarios(
+            @Valid @RequestBody ImportScenarioComparisonRequest request)
     {
         return analysisService.compareScenarios(request);
+    }
+
+    @PostMapping("/price-analysis")
+    public List<SaleScenarioAnalysis> analyzePrice(
+            @Valid @RequestBody PriceAnalysisRequest request)
+    {
+        return profitabilityCalculator.analyzePrice(
+                request.landedCostUnitClp(),
+                request.localReferencePriceClp()
+        );
     }
 }

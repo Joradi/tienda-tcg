@@ -42,6 +42,46 @@ public class ImportProfitabilityCalculator {
                 .toList();
     }
 
+    public List<SaleScenarioAnalysis> analyzePrice(long landedCostUnitClp, long localReferencePriceClp)
+    {
+        if(landedCostUnitClp < 0)
+        {
+            throw new IllegalArgumentException("El costo unitario no puede ser negativo");
+        }
+
+        if(localReferencePriceClp <= 0)
+        {
+            throw new IllegalArgumentException("El precio de referencia local debe ser mayor que cero");
+        }
+
+        SaleScenarioAnalysis quick = calculateScenario(
+                SaleStrategy.QUICK,
+                landedCostUnitClp,
+                localReferencePriceClp,
+                quickSaleFactor
+        );
+
+        SaleScenarioAnalysis normal = calculateScenario(
+                SaleStrategy.NORMAL,
+                landedCostUnitClp,
+                localReferencePriceClp,
+                normalSaleFactor
+        );
+
+        SaleScenarioAnalysis slow = calculateScenario(
+                SaleStrategy.SLOW,
+                landedCostUnitClp,
+                localReferencePriceClp,
+                slowSaleFactor
+        );
+
+        return List.of(
+                quick,
+                normal,
+                slow
+        );
+    }
+
     private ImportItemProfitabilityAnalysis analyzeItem(ImportItemCostAnalysis cost)
     {
         if (cost.localReferencePriceClp() <= 0)
@@ -49,21 +89,40 @@ public class ImportProfitabilityCalculator {
             throw new IllegalArgumentException("El precio de referencia local debe ser mayor que cero");
         }
 
-        SaleScenarioAnalysis quick = calculateScenario(SaleStrategy.QUICK, cost, quickSaleFactor);
-        SaleScenarioAnalysis normal = calculateScenario(SaleStrategy.NORMAL, cost, normalSaleFactor);
-        SaleScenarioAnalysis slow = calculateScenario(SaleStrategy.SLOW, cost, slowSaleFactor);
+        SaleScenarioAnalysis quick = calculateScenario(
+                SaleStrategy.QUICK,
+                cost.landedCostUnitClp(),
+                cost.localReferencePriceClp(),
+                quickSaleFactor
+        );
+
+        SaleScenarioAnalysis normal = calculateScenario(
+                SaleStrategy.NORMAL,
+                cost.landedCostUnitClp(),
+                cost.localReferencePriceClp(),
+                normalSaleFactor
+        );
+
+        SaleScenarioAnalysis slow = calculateScenario(
+                SaleStrategy.SLOW,
+                cost.landedCostUnitClp(),
+                cost.localReferencePriceClp(),
+                slowSaleFactor
+        );
+
         ImportViability viability = determineViability(quick, normal);
 
         return new ImportItemProfitabilityAnalysis(cost, quick, normal, slow, viability);
     }
 
-    private SaleScenarioAnalysis calculateScenario(SaleStrategy strategy, ImportItemCostAnalysis cost, BigDecimal factor)
+    private SaleScenarioAnalysis calculateScenario(SaleStrategy strategy, long landedCostUnitClp,
+                                                   long localReferencePriceClp, BigDecimal factor)
     {
-        long salePriceClp = BigDecimal.valueOf(cost.localReferencePriceClp())
-                        .multiply(factor).setScale(0, RoundingMode.HALF_UP).longValueExact();
+        long salePriceClp = BigDecimal.valueOf(localReferencePriceClp)
+                .multiply(factor).setScale(0, RoundingMode.HALF_UP).longValueExact();
 
-        long profitPerUnitClp = Math.subtractExact(salePriceClp, cost.landedCostUnitClp());
-        BigDecimal markup = calculateMarkup(profitPerUnitClp, cost.landedCostUnitClp());
+        long profitPerUnitClp = Math.subtractExact(salePriceClp, landedCostUnitClp);
+        BigDecimal markup = calculateMarkup(profitPerUnitClp, landedCostUnitClp);
 
         BigDecimal margin = calculateMargin(profitPerUnitClp, salePriceClp);
 
@@ -97,8 +156,7 @@ public class ImportProfitabilityCalculator {
             return BigDecimal.ZERO;
         }
 
-        return BigDecimal.valueOf(profitClp)
-                .divide(BigDecimal.valueOf(landedCostClp), PERCENTAGE_SCALE, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(profitClp).divide(BigDecimal.valueOf(landedCostClp), PERCENTAGE_SCALE, RoundingMode.HALF_UP);
     }
 
     private BigDecimal calculateMargin(long profitClp, long salePriceClp)
@@ -108,8 +166,7 @@ public class ImportProfitabilityCalculator {
             return BigDecimal.ZERO;
         }
 
-        return BigDecimal.valueOf(profitClp)
-                .divide(BigDecimal.valueOf(salePriceClp), PERCENTAGE_SCALE, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(profitClp).divide(BigDecimal.valueOf(salePriceClp), PERCENTAGE_SCALE, RoundingMode.HALF_UP);
     }
 
     private BigDecimal validateNonNegative(BigDecimal value, String message)

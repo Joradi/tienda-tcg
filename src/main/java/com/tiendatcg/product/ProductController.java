@@ -16,7 +16,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductResponseDto createProduct(@Valid  @RequestBody ProductCreateRequest request)
+    public ProductResponseDto createProduct(
+            @Valid @RequestBody ProductCreateRequest request)
     {
         Product product = productService.createProduct(request);
 
@@ -32,13 +33,13 @@ public class ProductController {
     }
 
     @GetMapping("/card/{cardId}")
-    public List<ProductResponseDto> getProductsByCardId(@PathVariable Long cardId)
+    public List<ProductResponseDto> getProductsByCardId(
+            @PathVariable Long cardId)
     {
         return productService.getProductsByCardId(cardId)
                 .stream()
                 .map(this::toResponseDto)
                 .toList();
-
     }
 
     @GetMapping("/available")
@@ -58,8 +59,10 @@ public class ProductController {
                 .map(this::toResponseDto)
                 .toList();
     }
+
     @GetMapping("/card/{cardId}/available")
-    public List<ProductResponseDto> getAvailableProductsByCardId(@PathVariable Long cardId)
+    public List<ProductResponseDto> getAvailableProductsByCardId(
+            @PathVariable Long cardId)
     {
         return productService.getAvailableProductsByCardId(cardId)
                 .stream()
@@ -68,8 +71,9 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ProductResponseDto updateProduct(@PathVariable Long id,
-                                            @Valid @RequestBody ProductUpdateRequest request)
+    public ProductResponseDto updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductUpdateRequest request)
     {
         Product product = productService.updateProduct(id, request);
 
@@ -83,6 +87,13 @@ public class ProductController {
                 product.getCard().getId(),
                 product.getCard().getName(),
                 product.getCard().getImageUrl(),
+                product.getCard().getNumber(),
+                product.getCard().getCardSet().getName(),
+                product.getCard().getCardSet().getPrintedTotal(),
+                product.getCard().getIllustrator(),
+                product.getCard().getRarity(),
+                product.getCard().getSuperType(),
+                product.getCard().getSubTypes(),
                 product.getLanguage(),
                 product.getVariant(),
                 product.getCondition(),
